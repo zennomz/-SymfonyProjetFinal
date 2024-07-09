@@ -30,4 +30,28 @@ class ProductController extends AbstractController
         $em->flush();
         return $this->json($product);
     }
+
+    #[Route('/product/update', name: 'update_product', methods: ['POST'])]
+    public function updateProduct(Request $request, EntityManagerInterface $em, ProductRepository $productRepository): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $product = $productRepository->find($data['id']);
+        $product->setName($data['name']);
+        $product->setPrice($data['price']);
+        $em->flush();
+        return $this->json($product);
+    }
+
+    #[Route('/product/delete', name: 'delete_product', methods: 'POST')]
+    public function deleteProduct(Request $request, EntityManagerInterface $em, ProductRepository $productRepository): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $product = $productRepository->find($data['id']);
+        $productName = $product->getName();
+        $productPrice = $product->getPrice();
+        $em->remove($product);
+        $em->flush();
+
+        return $this->json("Le produit $productName avec un prix de $productPrice a été supprimé.");
+    }
 }
